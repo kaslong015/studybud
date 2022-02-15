@@ -14,7 +14,7 @@ class Topic(models.Model):
 
 class Room(models.Model):
     host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    # participants = models.ForeignKey(User, related_name='rooms')
+    participants = models.ManyToManyField(User, related_name='participants',blank=True)
     topic = models.ForeignKey(Topic, null=True, on_delete=SET_NULL)
     name = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
