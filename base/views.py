@@ -73,7 +73,7 @@ def home(request):
         Q(host__username__icontains=q)
     )
 
-    topics = Topic.objects.all()
+    topics = Topic.objects.all()[0:5]
     room_count = rooms.count()
 
     room_message = Message.objects.filter(Q(
@@ -107,28 +107,43 @@ def room(request, pk):
 @login_required(login_url='/login/')
 def createRoom(request):
     form = RoomForm()
+    topics = Topic.objects.all()
 
     if request.method == 'POST':
-        form = RoomForm(request.POST)
-        if form.is_valid():
-            room = form.save(commit=False)
-            room.host = request.user
-            room.save()
-            return redirect('/')
-    context = {'form': form}
+        topic_name = request.POST.get('topic')
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+        Room.objects.create(
+            host=request.user,
+            topic=topic,
+            name=request.POST.get('name'),
+            description=request.POST.get('description')
+        )
+
+        return redirect('/')
+    context = {'form': form, 'topics': topics}
     return render(request, 'base/form_room.html', context)
 
 
 @login_required(login_url='/login/')
 def updateRoom(request, pk):
     room = Room.objects.get(id=pk)
+    form = RoomForm(instance=room)
+    topics = Topic.objects.all()
 
     if request.user != room.host:
         return redirect('/')
 
-    form = RoomForm(instance=room)
-    context = {'form': form}
+    if request.method == 'POST':
+        topic_name = request.POST.get('topic')
+        topic, created = Topic.objects.get_or_create(name=topic_name)
 
+        room.name = request.POST.get('name')
+        room.topic = topic
+        room.description = request.POST.get('description')
+        room.save()
+        return redirect('home')
+
+    context = {'form': form, 'topics': topics, 'room': room}
     return render(request, 'base/form_room.html', context)
 
 
@@ -161,9 +176,42 @@ def deleteMessage(request, pk):
 @login_required(login_url='/login/')
 def userProfile(request, pk):
 
+    # get user with id
     user = User.objects.get(id=pk)
+
+    # get all room for user with pk
     rooms = user.room_set.all()
+
+    # get all topics
     topics = Topic.objects.all()
 
     context = {'user': user, 'rooms': rooms, 'topics': topics}
     return render(request, 'base/profile.html', context)
+
+
+@login_required(login_url='/login/')
+def updateUser(request):
+    user = request.user
+    form = UserForm(instance=user)
+
+    if request.method == 'POST':
+        form = UserForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('user-profile', pk=user.id)
+
+    context = {'form': form}
+    return render(request, 'base/update-user.html', context)
+
+
+def topicPage(request):
+
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+
+    topics = Topic.objects.filter(name__icontains=q)
+    return render(request, 'base/topics.html', {'topics': topics})
+
+
+def activityPage(request):
+    room_message = Message.objects.all()
+    return render(request,'base/activity.html',{'room_message':room_message})

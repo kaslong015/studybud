@@ -9,7 +9,10 @@ urlpatterns = [
     path('delete_room/<str:pk>/', deleteRoom, name='delete_room'),
     path('profile/<str:pk>/', userProfile, name='user-profile'),
     path('delete_message/<str:pk>/', deleteMessage, name='delete-message'),
+    path('update_user/', updateUser, name='update-user'),
     path('login/', LoginPage, name='login'),
     path('logout/', LogoutPage, name='logout'),
     path('register/', registerPage, name='register'),
+    path('topics/', topicPage, name='topics'),
+    path('activity/', activityPage, name='activity'),
 ]

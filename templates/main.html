@@ -1,16 +1,17 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="{% static 'styles/style.css' %}" />
+    <title>StudyBuddy</title>
+  </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{% static 'styles/main.css' %}">
-    <title>Document</title>
-</head>
-
-<body>
+  <body>
+  
     {% include 'navbar.html' %}
 
     {% if messages %}
@@ -26,6 +27,12 @@
     {% block content %}
 
     {% endblock %}
-</body>
-
+   
+    <script src="{% static 'js/script.js' %}"></script>
+  </body>
 </html>
+
+
+
+
+
